@@ -1,144 +1,140 @@
-const genHTML = require ('./src/generatehtml');
+const Manager = require("./lib/Manager.js");
+const Engineer = require("./lib/Engineer.js");
+const Intern = require("./lib/Intern.js");
 const fs = require ('fs');
 const inquirer = require('inquirer');
+const newGenTeam = require('./src/generatehtml.js')
 
 
 
 
 
-const arrayMembers = []
-
-managePrompt = () => {
-    return inquirer.prompt([
 
 
-{
-    type: 'input',
-    message :'name?',
-    name:'name'
 
 
-},
-{
-    type: 'input',
-    message :' id?',
-    name:'empId'
 
-},
-{
-    type: 'input',
-    message :' email?',
-    name:'email'
+const teamArray = []
 
-},
-{
-    type: 'input',
-    message :' office number?',
-    name:'officeNum'
+function loadAll () {
+    function newTeam () {
+        inquirer.prompt([{
+            type: "list",
+            message: "What type of employee?",
+            name: "addEmployeePrompt",
+            choices: ["Manager", "Engineer", "Intern"]
+
+        }]).then (function (userInput) {
+            switch(userInput.addEmployeePrompt) {
+                case "Manager":
+                addManager();
+                    break;
+                    case "Engineer":
+                        addEngineer();
+                        break;
+                        case "intern":
+                            addIntern();
+                            break;
+                            default:
+                                htmlBuilder();
+            }
+        })
+    }
+    
+function addManager() {
+    inquirer.prompt ([
+      
+      {
+        type: "input",
+        name: "managerName",
+        message: "manager name ?"
+      },
+      {
+        type: "input",
+        name: "managerId",
+        message: "id number ?"
+      },
+      {
+        type: "input",
+        name: "managerEmail",
+        message: "email address ?"
+      },
+      {
+        type: "input",
+        name: "managerOfficeNumber",
+        message: "office number ?"
+      }
+    ]).then(answers => {
+        const manager = new Manager(answers.managerName, answers.managerId, answers.managerEmail, answers.managerOfficeNumber);
+        teamArray.push(manager);
+        newTeam();
+    });
+
 
 }
-]).then(managerData => {
 
-        const {name, empId, email, officeNum} = managerData;
-        const manager = new Manager (name, empId, email, officeNum);
-        arrayMembers.push(manager);
-        
-
-}) 
-}
-
-
-
-
-
-employeePrompt = () => {
-    return inquirer.prompt([
+function addEngineer() {
+    inquirer.prompt ([
+      
         {
-            type: 'list',
-            message :'engineer or intern?',
-            name:'empRoll',
-            choices: ['intern', 'engineer']
-        
+          type: "input",
+          name: "engineerName",
+          message: "engineer name ?"
         },
         {
-            type: 'input',
-            message :'name?',
-            name:'name'
-            
-            
-        
+          type: "input",
+          name: "engineerId",
+          message: "id number ?"
         },
         {
-            type: 'input',
-            message :'id?',
-            name:'empId'
-            
-        
+          type: "input",
+          name: "engineerEmail",
+          message: "email address ?"
         },
         {
-            type: 'input',
-            message :'email ?',
-            name:'empEmail'
-        
-        
-        },
-        {
-            type: 'input',
-            message :'github',
-            name:'empGit'
-        
-        
-        },
-        {
-            type: 'input',
-            message :'school ?',
-            name:'empSchool'
-        
-        
-        },
-        {
-            type: 'confirm',
-            message :'would u like to add a team member ?',
-            name:'empExtra'
-        
-        
+          type: "input",
+          name: "engineerGithub",
+          message: "Github ?"
         }
-    ]).then(employeeData => {
-        var employee;
-        const {name, empId, empEmail,empGit, empSchool, empExtra} = employeeData;
-        
-        if(empRoll  === 'intern') {
-            employee = new Engineer (name, empId,empEmail,empGit);
-                
-        } else {
-            employee = new Intern (name, empId,empEmail,empSchool);
-        }
-        arrayMembers.push(employee);
-        
-        if(empExtra) {
-            return employeePrompt()
-        } else {
-            return arrayMembers()
-        }
-        
-}) 
+    ]).then(answers => {
+        const engineer = new Engineer(answers.engineerName, answers.engineerId, answers.engineerEmail, answers.engineerGithub);
+        teamArray.push(engineer);
+        newTeam();
+    });
 }
-const writeFile = data => {
-    fs.filewrite('./dist/index.html', data, null, (err) => {
-        err ? console.error(err) : console.log("Your team profile generated");
-    })
+function addIntern() {
+    inquirer.prompt ([
+      
+        {
+          type: "input",
+          name: "internName",
+          message: "intern name ?"
+        },
+        {
+          type: "input",
+          name: "internId",
+          message: "id number ?"
+        },
+        {
+          type: "input",
+          name: "internEmail",
+          message: "email address ?"
+        },
+        {
+          type: "input",
+          name: "internSchool",
+          message: "school ?"
+        }
+    ]).then(answers => {
+        const intern = new Intern(answers.internName, answers.internId, answers.internEmail, answers.internSchool);
+        teamArray.push(intern);
+        newTeam();
+});
 }
-managePrompt()
-    .then(employeePrompt)
-    .then (arrayMembers => {
-        return genHTML(arrayMembers)
-    })
-    .then (indexHTML =>  {
-        return writeFile(indexHTML);
-    })
-
-
-
-
-
-
+function htmlBuilder () {
+    console.log("Team made")
+    fs.writeFileSync("./dist/team.html", newGenTeam(teamArray), "UTF-8")
+}
+newTeam();
+}
+loadAll();
