@@ -22,7 +22,7 @@ function loadAll () {
             type: "list",
             message: "What type of employee?",
             name: "addEmployeePrompt",
-            choices: ["Manager", "Engineer", "Intern"]
+            choices: ["Manager", "Engineer", "Intern","end"]
 
         }]).then (function (userInput) {
             switch(userInput.addEmployeePrompt) {
@@ -32,7 +32,10 @@ function loadAll () {
                     case "Engineer":
                         addEngineer();
                         break;
-                        case "intern":
+                        case "Intern":
+                            addIntern();
+                            break;
+                            case "End":
                             addIntern();
                             break;
                             default:
@@ -131,6 +134,8 @@ function addIntern() {
         newTeam();
 });
 }
+
+
 function htmlBuilder () {
     console.log("Team made")
     fs.writeFileSync("./dist/team.html", newGenTeam(teamArray), "UTF-8")
